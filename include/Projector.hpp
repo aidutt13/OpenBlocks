@@ -23,26 +23,48 @@ namespace projector {
     struct mesh;
 
     struct vector4d {
-        array< double, 4 > p;
+        array< float, 4 > p;
 
-        constexpr double& operator[](size_t);
+        vector4d operator+(vector4d&);
+        vector4d operator-(vector4d&);
+        float& operator[](size_t);
 
+        float& at(size_t);
         int32_t round(size_t);
     };
 
     struct matrix4d {
-        array< array< double, 4 >, 4 > p;
+        array< array< float, 4 >, 4 > p;
 
-        const array< double, 4 >& operator[](size_t);
+        array< float, 4 >& operator[](size_t);
 
+        /*
+        *   Fill matrix with specific values
+        */
         void fill(
-            double, double, double, double,
-            double, double, double, double,
-            double, double, double, double,
-            double, double, double, double
+            float, float, float, float,
+            float, float, float, float,
+            float, float, float, float,
+            float, float, float, float
         );
 
-        vector4d operator*(vector4d&);
+        /*
+        *   Fill matrix with one specific value
+        */
+        void fillAll(float);
+
+        vector4d operator*(vector4d);
+        matrix4d operator*(matrix4d);
+
+        /*
+        *   Master method for matrix by matrix multiplication
+        */
+        matrix4d multiplyByMatrix(matrix4d&);
+
+        /*
+        *   Master method for matrix by vector multiplication
+        */
+        vector4d multiplyByVector(vector4d&);
     };
 
     struct triangle {
@@ -53,6 +75,9 @@ namespace projector {
     struct mesh {
         dyn_array< triangle > triangles;
 
+        /*
+        *   Return the count of the triangles in the mesh
+        */
         size_t size();
     };
 
@@ -68,10 +93,50 @@ namespace projector {
     *   Returns:
     *       Matrix4d: projection matrix
     */
-    const matrix4d createProjectionMatrix(const double&, const double&, const double&, const double&);
-    const vector4d projectPoint(vector4d&, matrix4d&); 
+    matrix4d createProjectionMatrix(const float&, const float&, const float&, const float&);
 
-    extern const double PI;
+    /*
+    *   Creates an X rotation matrix with specified angle Theta
+    */
+    matrix4d createXRotationMatrix(float); 
+
+    /*
+    *   Creates a Z rotation matrix with specified angle Theta
+    */
+    matrix4d createZRotationMatrix(float); 
+
+    /*
+    *   Translates point by a vector
+    */
+    vector4d translatePoint(vector4d&, vector4d&);
+    vector4d translatePoint(vector4d&, vector4d&, matrix4d&);
+
+    /*
+    *   Implementation of dot product of two vectors
+    */
+    float dotProduct(vector4d&, vector4d&);
+
+    /*
+    *   Implementation of cross product of two vectors
+    */
+    vector4d crossProduct(vector4d&, vector4d&);
+
+    /*
+    *   Computes the triangle's normal
+    */
+    vector4d getNormalOfTriangle(triangle&);
+
+    /*
+    *   Divides vector by its length
+    */
+    vector4d normalize(vector4d&);
+
+    /*
+    *   Projects a 3D point to 2D display
+    */
+    vector4d projectPoint(vector4d&, matrix4d&); 
+
+    extern const float PI;
     extern const mesh CUBE;
 }
 

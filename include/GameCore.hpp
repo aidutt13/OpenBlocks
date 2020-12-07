@@ -12,10 +12,14 @@ class GameCore;
 class GameCore : public olc::PixelGameEngine {
     
 public:
-    double fov = .0;
-    double aspectRatio = .0;
-    double zNear = .0;
-    double zFar = .0;
+    float fov = .0f;
+    float aspectRatio = .0f;
+    float zNear = .0f;
+    float zFar = .0f;
+
+    float theta = .0f;
+
+    projector::vector4d camera;
 
     projector::matrix4d projectionMatrix;
 
