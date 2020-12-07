@@ -17,7 +17,7 @@ public:
     double zNear = .0;
     double zFar = .0;
 
-    Eigen::Matrix4d projectionMatrix;
+    projector::matrix4d projectionMatrix;
 
 public:
     /*
@@ -39,7 +39,7 @@ public:
 
 protected:
 
-    void _DrawTriangle(const projector::triangle&, const olc::Pixel&);
+    void _DrawTriangle(projector::triangle&, const olc::Pixel&);
 };
 
 

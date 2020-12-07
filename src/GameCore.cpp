@@ -10,7 +10,7 @@ bool GameCore::OnUserCreate() {
 
     this->fov = 1.0 / std::tan(90.0 / 360.0 * projector::PI);
     this->aspectRatio = ScreenWidth() / ScreenHeight();
-    this->zNear = 0.1;
+    this->zNear = 1.0;
     this->zFar = 1000.0;
 
 
@@ -24,26 +24,39 @@ bool GameCore::OnUserUpdate(float fElapsedTime) {
 
     for (triangle t : CUBE.triangles) {
         triangle projected;
-
+        std::cout << "loop\n";
         for (size_t i{ 0 }; i < 3; ++i) {
             projected.points[i] = projectPoint(t.points[i], projectionMatrix);
         }
+        
+        auto& points = projected.points;
 
-        _DrawTriangle(projected, olc::WHITE);
+
+        DrawLine(
+            points[0].round(0), points[0].round(1),
+            points[1].round(0), points[1].round(1)
+        );
+        DrawLine(
+            points[0].round(0), points[0].round(1),
+            points[2].round(0), points[2].round(1)
+        );
+        DrawLine(
+            points[1].round(0), points[1].round(1),
+            points[2].round(0), points[2].round(1)
+        );
+        
     }
 
     return true;
 }
 
-void GameCore::_DrawTriangle(const triangle& tri, const olc::Pixel& p = olc::WHITE) {
-    olc::vi2d v[3];
-    const auto& points = tri.points;
-    for (size_t i = 0; i < 3; ++i) {
-        v[i] = {
-            static_cast<int>(std::round(points[i][0])),     // X
-            static_cast<int>(std::round(points[i][1]))      // Y
-        };
-    }
-
-    DrawTriangle(v[0], v[1], v[2], p);
+void GameCore::_DrawTriangle(triangle& tri, const olc::Pixel& p = olc::WHITE) {
+    auto& points = tri.points;
+    
+    DrawTriangle(
+        points[0].round(0), points[0].round(1),
+        points[1].round(0), points[1].round(1),
+        points[2].round(0), points[2].round(1),
+        p
+    );
 }

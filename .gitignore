@@ -1,0 +1,7 @@
+# Compiled files
+obj/
+blocks
+
+
+# VSCode files
+.vscode

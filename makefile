@@ -1,7 +1,7 @@
 PROJECT = blocks
 
 CXX = clang++
-CFLAGS = -Wall -Wextra --std=c++17 -O2
+CFLAGS = -Wall -Wextra --std=c++17 -O3
 LIBS = -lGLEW -lX11 -lGLU -lGL -lpng16 -lz -lpthread
 
 SRC = src
