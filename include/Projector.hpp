@@ -101,6 +101,11 @@ namespace projector {
     matrix4d createXRotationMatrix(float); 
 
     /*
+    *   Creates a Y rotation matrix with specified angle Theta
+    */
+    matrix4d createYRotationMatrix(float); 
+
+    /*
     *   Creates a Z rotation matrix with specified angle Theta
     */
     matrix4d createZRotationMatrix(float); 

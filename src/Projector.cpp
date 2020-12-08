@@ -152,6 +152,21 @@ projector::matrix4d projector::createXRotationMatrix(float _theta) {
     return rotationX;
 }
 
+projector::matrix4d projector::createYRotationMatrix(float _theta) {
+    matrix4d rotationY;
+
+    rotationY.fillAll(0.0f);
+
+    rotationY[0][0] = std::cos(_theta);
+    rotationY[0][2] = -std::sin(_theta);
+    rotationY[1][1] = 1;
+    rotationY[2][0] = std::sin(_theta);
+    rotationY[2][2] = std::cos(_theta);
+    rotationY[3][3] = 1;
+
+    return rotationY;
+}
+
 projector::matrix4d projector::createZRotationMatrix(float _theta) {
     matrix4d rotationZ;
 
@@ -183,7 +198,7 @@ float projector::dotProduct(vector4d& a, vector4d& b) {
 }
 
 projector::vector4d projector::crossProduct(vector4d& a, vector4d& b) {
-    vector4d cross{ 0.0f, 0.0f, 0.0f, 0.0f };
+    vector4d cross{ 0.0f, 0.0f, 0.0f, 1.0f };
     
     cross[0] = a[1] * b[2] - a[2] * b[1];
     cross[1] = a[2] * b[0] - a[0] * b[2];
@@ -195,7 +210,7 @@ projector::vector4d projector::crossProduct(vector4d& a, vector4d& b) {
 projector::vector4d projector::getNormalOfTriangle(triangle& t) {
 
     vector4d line1, line2, normal;
-    normal = { 0.0f, 0.0f, 0.0f, 0.0f };
+    normal = { 0.0f, 0.0f, 0.0f, 1.0f };
     line1 = normal, line2 = normal;         // Set all to zero
 
     for (size_t i = 0; i < 3; ++i) {

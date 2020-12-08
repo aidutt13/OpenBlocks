@@ -17,7 +17,9 @@ public:
     float zNear = .0f;
     float zFar = .0f;
 
-    float theta = .0f;
+    float thetaX = .0f;
+    float thetaY = .0f;
+    float thetaZ = .0f;
 
     projector::vector4d camera;
 
@@ -44,6 +46,7 @@ public:
 protected:
 
     void _DrawTriangle(projector::triangle&, const olc::Pixel&);
+    void _FillTriangle(projector::triangle&, const olc::Pixel&);
 };
 
 
