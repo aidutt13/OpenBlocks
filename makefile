@@ -1,29 +1,32 @@
-PROJECT = blocks
+target 	:= blocks
+objs 	:= Main.o 
 
-CXX = clang++
-CFLAGS = -Wall -Wextra --std=c++17 -O3
-LIBS = -lGLEW -lX11 -lGLU -lGL -lpng16 -lz -lpthread
+CXX 	:= clang++
+LIBS 	:= -lGLEW -lX11 -lGLU -lGL -lpng16 -lz -lpthread
+CFLAGS 	:= -Wall -Wextra --std=c++17 -O3 $(LIBS)
 
-SRC = src
-OBJ = obj
-INC = include
+SRCDIR = src
+OBJDIR = obj
+DEPSDIR = deps
+INCDIR = include
 
-INCLUDE = -I$(INC)
+OBJ := $(patsubst %.o, $(OBJDIR)/%.o, $(objs))
 
-$(PROJECT): GameCore Main Projector
-	$(CXX) $(CFLAGS) $(LIBS) $(patsubst %,$(OBJ)/%.o,$^) -o $@
+all: $(target)
 
-Projector: %: $(SRC)/%.cpp
-	$(CXX) $(CFLAGS) $(LIBS) -c $< -o $(OBJ)/$@.o $(INCLUDE)
+deps := $(patsubst $(OBJDIR)/%.o, $(DEPSDIR)/%.d, $(OBJ))
+-include $(deps)
+DEPFLAGS = -MMD -MF $(patsubst $(OBJDIR)/%.o, $(DEPSDIR)/%.d, $@)
 
-GameCore: %: $(SRC)/%.cpp
-	$(CXX) $(CFLAGS) $(LIBS) -c $< -o $(OBJ)/$@.o $(INCLUDE)
+$(target): $(OBJ)
+	$(CXX) $(CFLAGS) -o $@ $^
 
-Main: %: $(SRC)/%.cpp
-	$(CXX) $(CFLAGS) $(LIBS) -c $< -o $(OBJ)/$@.o $(INCLUDE)
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CFLAGS) -c $< $(DEPFLAGS) -I$(INCDIR)
+
 
 clean:
 	@echo Removing obj files...
-	@rm -f $(OBJ)/*.o $(PROJECT)
+	@rm -f $(OBJ) $(target) $(DEPSDIR)/$(deps)
 
 .PHONY: clean print
