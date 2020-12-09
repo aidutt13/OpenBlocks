@@ -2,7 +2,7 @@
 
 const float projector::PI = 3.14159f;
 
-projector::vector4d projector::vector4d::operator+(vector4d& _vector) {
+projector::vector4d projector::vector4d::operator+(vector4d _vector) {
     vector4d v = *this;
 
     for (size_t i = 0; i < 4; ++i)
@@ -11,7 +11,7 @@ projector::vector4d projector::vector4d::operator+(vector4d& _vector) {
     return v;
 }
 
-projector::vector4d projector::vector4d::operator-(vector4d& _vector) {
+projector::vector4d projector::vector4d::operator-(vector4d _vector) {
     vector4d v = *this;
 
     for (size_t i = 0; i < 4; ++i)
@@ -109,6 +109,21 @@ projector::vector4d projector::matrix4d::multiplyByVector(vector4d& r) {
 
 size_t projector::mesh::size() {
     return triangles.size();
+}
+
+projector::mesh projector::mesh::loadFromFile(std::string& path) {
+
+    std::ifstream f(path);
+
+    if (!f.is_open())
+        throw std::exception();
+
+    dyn_array< vector4d > points;
+
+    while (!f.eof()) {
+        
+    }
+
 }
 
 projector::matrix4d projector::createProjectionMatrix(
@@ -248,6 +263,43 @@ projector::vector4d projector::projectPoint(vector4d& _point, matrix4d& _project
     return v;
 }
 
+projector::mesh projector::projectObjectToScreen(object::Object* obj, projection_variables& vars) {
+
+    mesh _mesh = obj->getObjectMesh();
+    mesh ret;
+    matrix4d projectionMatrix = createProjectionMatrix(
+        vars.aspectRatio,
+        vars.fov,
+        vars.zNear,
+        vars.zFar
+    );
+
+    matrix4d translation = obj->getRotationMatrix() * obj->getScaleMatrix();
+
+    for (triangle& t : _mesh.triangles) {
+        
+        for (size_t i = 0; i < 3; ++i) {
+            vector4d position = obj->getWorldPosition();
+            t.points[i] = translatePoint(t.points[i], position, translation);
+        }
+
+        vector4d triangleNormal = getNormalOfTriangle(t);
+        normalize(triangleNormal);
+
+        vector4d trianglePoint = t.points[0] - vars.camera_pos;
+
+        if (dotProduct(triangleNormal, trianglePoint) < 0.0f) {
+            ret.triangles.push_back({0.0f, 0.0f, 0.0f, 1.0f});
+            triangle& retTriangle = ret.triangles.back();
+            for (size_t i = 0; i < 3; ++i) {
+                retTriangle.points[i] = 
+                    projectPoint(t.points[i], projectionMatrix);
+            }
+        }
+    }
+
+    return ret;
+}
 
 const projector::mesh projector::CUBE {
     mesh{{

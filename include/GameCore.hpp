@@ -5,6 +5,10 @@
 
 #include "Projector.hpp"
 
+#include "Object.hpp"
+
+#include "assets/Player.hpp"
+
 #include <iostream>
 
 class GameCore;
@@ -12,16 +16,15 @@ class GameCore;
 class GameCore : public olc::PixelGameEngine {
     
 public:
-    float fov = .0f;
-    float aspectRatio = .0f;
-    float zNear = .0f;
-    float zFar = .0f;
+    Player player;
+
+    projector::projection_variables vars = {.0f, .0f, .0f, .0f, { .0f, .0f, .0f, .0f} };
+
+    object::Object cube;
 
     float thetaX = .0f;
     float thetaY = .0f;
     float thetaZ = .0f;
-
-    projector::vector4d camera;
 
     projector::matrix4d projectionMatrix;
 

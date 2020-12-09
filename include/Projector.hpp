@@ -8,12 +8,19 @@ using std::array;
 
 #include <exception>
 
-#include <iostream>
+#include <fstream>
+
+#include <filesystem>
+
+#include <sstream>
 
 #include <vector>
 template <typename T>
 using dyn_array = std::vector<T>;
 
+#include "Object.hpp"
+
+#include "assets/Camera.hpp"
 
 namespace projector {
 
@@ -22,11 +29,13 @@ namespace projector {
     struct triangle;
     struct mesh;
 
+    struct projection_variables;
+
     struct vector4d {
         array< float, 4 > p;
 
-        vector4d operator+(vector4d&);
-        vector4d operator-(vector4d&);
+        vector4d operator+(vector4d);
+        vector4d operator-(vector4d);
         float& operator[](size_t);
 
         float& at(size_t);
@@ -79,6 +88,13 @@ namespace projector {
         *   Return the count of the triangles in the mesh
         */
         size_t size();
+
+        static mesh loadFromFile(std::string&);
+    };
+
+    struct projection_variables {
+        float aspectRatio, fov, zNear, zFar;
+        vector4d camera_pos; 
     };
 
     /*
@@ -140,6 +156,8 @@ namespace projector {
     *   Projects a 3D point to 2D display
     */
     vector4d projectPoint(vector4d&, matrix4d&); 
+
+    mesh projectObjectToScreen(object::Object*, projection_variables&);
 
     extern const float PI;
     extern const mesh CUBE;

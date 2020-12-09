@@ -8,96 +8,33 @@ GameCore::GameCore() {
 
 bool GameCore::OnUserCreate() {
 
-    this->fov = 1.0f / std::tan( (90.0f * 0.5f) / (180.0f * PI) );
-    this->aspectRatio = (float)ScreenWidth() / (float)ScreenHeight();
-    this->zNear = 0.1f;
-    this->zFar = 1000.0f;
-
     this->thetaX = 0.0f;
     this->thetaY = 0.0f;
     this->thetaZ = 0.0f;
 
-    this->camera = { 0.0f, 0.0f, 0.0f, 0.0f };
+    this->player.onCreate();
 
-    this-> projectionMatrix = createProjectionMatrix(
-        this->aspectRatio,
-        this->fov,
-        this->zNear,
-        this->zFar
-    );
+    this->vars.aspectRatio = (float)ScreenWidth() / (float)ScreenHeight();
+    this->vars.fov = this->player.fov;
+    this->vars.zNear = 0.1f;
+    this->vars.zFar = 1000.0f;
+    this->vars.camera_pos = this->player.getWorldPosition() + this->player.cameraRelativePosition;
+
+    this->cube.setObjectMesh(projector::CUBE);
 
     return true;
 }
 
-bool GameCore::OnUserUpdate(float fElapsedTime) {
+bool GameCore::OnUserUpdate(float deltaTime) {
     
     Clear(olc::DARK_BLUE);
 
-    if (GetKey(olc::LEFT).bHeld)
-        thetaX += 1.0f * fElapsedTime;
-    if (GetKey(olc::RIGHT).bHeld)
-        thetaX += -1.0f * fElapsedTime;
-    if (GetKey(olc::UP).bHeld)
-        thetaY += 1.0f * fElapsedTime;
-    if (GetKey(olc::DOWN).bHeld)
-        thetaY += -1.0f * fElapsedTime;
-    if (GetKey(olc::Q).bHeld)
-        thetaZ += 1.0f * fElapsedTime;
-    if (GetKey(olc::E).bHeld)
-        thetaZ += -1.0f * fElapsedTime;
-    
-    vector4d translateVector = { 0.0f, 0.0f, 3.0f, 0.0f }; 
-    matrix4d rotationMatrix =
-        createXRotationMatrix(thetaX) * createYRotationMatrix(thetaY) * createZRotationMatrix(thetaZ);
+    this->player.onUpdate(deltaTime);
 
-    for (triangle t : CUBE.triangles) {
-
-        triangle translated, projected;
-
-        // Projection
-        for (size_t i{ 0 }; i < 3; ++i) {
-
-            // Translation
-            translated.points[i] = translatePoint(t.points[i], translateVector, rotationMatrix);
-
-        }
-
-        vector4d normal{ 0.0f, 0.0f, 0.0f, 0.0f };
-        vector4d light{ 0.0f, 0.0f, -1.0f, 1.0f };
-
-        normal = getNormalOfTriangle(translated);
-        normalize(normal);
-
-        normalize(light);
-
-        vector4d normalizedTrianglePoint{ 0.0f, 0.0f, 0.0f, 0.0f };
-        normalizedTrianglePoint = (translated.points[0] - camera);
-
-        float lightDP = dotProduct(light, normal);
-        float objectColor = 255;
-        olc::Pixel p = olc::Pixel(objectColor * lightDP, objectColor * lightDP, objectColor * lightDP);
-        if (dotProduct(normal, normalizedTrianglePoint ) < 0.0f) {
-
-            for (size_t i{ 0 }; i < 3; ++i) {
-
-                // Projection
-                
-                projected.points[i] = projectPoint(translated.points[i], projectionMatrix);
-            }
-
-            // Scale temporary
-            for (size_t i{ 0 }; i < 3; ++i) {
-
-                projected.points[i][0] += 5.0f;
-                projected.points[i][1] += 5.0f;
-
-                projected.points[i][0] *= 0.05f * (float)ScreenWidth();
-                projected.points[i][1] *= 0.05f * (float)ScreenHeight();
-            }
-
-            _FillTriangle(projected, p);
-        }
-    }
+    mesh m = projectObjectToScreen(&this->cube, this->vars);
+  
+    for (triangle& t : m.triangles)
+        _FillTriangle(t, olc::WHITE);
 
     return true;
 }
